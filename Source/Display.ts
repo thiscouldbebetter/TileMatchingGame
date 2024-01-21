@@ -1,27 +1,48 @@
 
-function DisplayHelper()
-{}
+class Display
 {
-	DisplayHelper.prototype.clear = function()
+	viewSizeInPixels: Coords;
+
+	colorBackground: string;
+	colorBorderAndText: string;
+	colorHighlight: string;
+	graphics: any;
+	useColors: boolean;
+
+	drawPos: Coords;
+	drawSize: Coords;
+
+	constructor()
 	{
-		this.graphics.fillStyle = "White";
-		this.graphics.fillRect
+		this.colorBackground = "White";
+		this.colorBorderAndText = "Gray";
+		this.colorHighlight = "Black";
+	}
+
+	clear(): void
+	{
+		var g = this.graphics;
+
+		var size = this.viewSizeInPixels;
+
+		g.fillStyle = this.colorBackground;
+		g.fillRect
 		(
 			0, 0, 
-			this.viewSizeInPixels.x, 
-			this.viewSizeInPixels.y
+			size.x, 
+			size.y
 		);
 
-		this.graphics.strokeStyle = "LightGray";
-		this.graphics.strokeRect
+		g.strokeStyle = this.colorBorderAndText;
+		g.strokeRect
 		(
 			0, 0, 
-			this.viewSizeInPixels.x, 
-			this.viewSizeInPixels.y
+			size.x, 
+			size.y
 		);
 	}
 
-	DisplayHelper.prototype.drawLevel = function(level)
+	drawLevel(level: Level): void
 	{
 		this.clear();
 
@@ -57,16 +78,18 @@ function DisplayHelper()
 
 		var cursorSizeInPixels = mapCellSizeInPixels.clone().divideScalar(2);
 
-		if (cursor.isTileSelected == true)
+		var g = this.graphics;
+
+		if (cursor.isTileSelected)
 		{
-			this.graphics.strokeStyle = "Black";
+			g.strokeStyle = this.colorHighlight;
 		}
 		else
 		{
-			this.graphics.strokeStyle = "LightGray";
+			g.strokeStyle = this.colorBorderAndText;
 		}
 		
-		this.graphics.strokeRect
+		g.strokeRect
 		(
 			this.drawPos.x,
 			this.drawPos.y,
@@ -76,15 +99,15 @@ function DisplayHelper()
 
 		var fontHeight = 10; // hack
 
-		this.graphics.fillStyle = "LightGray";
-		this.graphics.fillText
+		g.fillStyle = this.colorBorderAndText;
+		g.fillText
 		(
 			"Matches:" + level.numberOfMatchesSoFar + "/" + level.numberOfMatchesToWin,
 			2, 
 			levelMap.sizeInPixels.y + fontHeight
 		);
 
-		this.graphics.fillText
+		g.fillText
 		(
 			"Moves:" + level.numberOfMovesSoFar + "/" + level.numberOfMovesAllowed,
 			2, 
@@ -92,7 +115,7 @@ function DisplayHelper()
 		);
 	}
 
-	DisplayHelper.prototype.drawMap = function(map)
+	drawMap(map: MapOfCells): void
 	{
 		var mapSizeInCells = map.sizeInCells;
 		var cellSizeInPixels = map.cellSizeInPixels;
@@ -100,8 +123,10 @@ function DisplayHelper()
 		var cellPos = new Coords(0, 0);
 		var drawPos = this.drawPos;
 
-		this.graphics.strokeStyle = "LightGray";
-	
+		var g = this.graphics;
+
+		g.strokeStyle = "LightGray";
+
 		for (var y = 0; y < mapSizeInCells.y; y++)
 		{
 			cellPos.y = y;
@@ -118,7 +143,7 @@ function DisplayHelper()
 					cellSizeInPixels
 				);
 
-				this.graphics.strokeRect
+				g.strokeRect
 				(
 					drawPos.x,
 					drawPos.y,
@@ -129,7 +154,7 @@ function DisplayHelper()
 		}
 	}
 
-	DisplayHelper.prototype.drawTile = function(tile, map)
+	drawTile(tile: Tile, map: MapOfCells): void
 	{
 		var tileDefn = tile.defn();
 		var mapCellSizeInPixels = map.cellSizeInPixels;
@@ -153,7 +178,9 @@ function DisplayHelper()
 			tile.ticksToLive == null ? null : (tile.ticksToLive / Level.TicksToEliminateTile)
 		)
 
-		if (this.useColors == true)
+		var g = this.graphics;
+
+		if (this.useColors)
 		{
 			if (tileFractionOfLifeRemaining != null)
 			{
@@ -169,26 +196,23 @@ function DisplayHelper()
 				(
 					drawSize
 				).divideScalar(2)
-			)
+			);
 
-			this.graphics.fillStyle = tileDefn.color;
-			this.graphics.fillRect
+			g.fillStyle = tileDefn.color;
+			g.fillRect
 			(
-				drawPos.x,
-				drawPos.y,
-				drawSize.x,
-				drawSize.y
+				drawPos.x, drawPos.y,
+				drawSize.x, drawSize.y
 			);
 		}
 		else
 		{
-			var tileWidth = this.graphics.measureText(tileDefn.symbol).width;
-
+			var tileWidth = g.measureText(tileDefn.symbol).width;
 
 			if (tileFractionOfLifeRemaining == null)
 			{
-				this.graphics.fillStyle = "LightGray";
-				this.graphics.fillText
+				g.fillStyle = this.colorBorderAndText;
+				g.fillText
 				(
 					tileDefn.symbol,
 					drawPos.x + (mapCellSizeInPixels.x - tileWidth) / 2,
@@ -197,19 +221,19 @@ function DisplayHelper()
 			}
 			else 
 			{
-				this.graphics.fillStyle = "Black";
-				this.graphics.fillText
+				g.fillStyle = "Black";
+				g.fillText
 				(
 					tileDefn.symbol,
 					drawPos.x + (mapCellSizeInPixels.x - tileWidth) / 2,
 					drawPos.y + mapCellSizeInPixels.y * .6
 				);
-					
+
 				if (tileFractionOfLifeRemaining < 1)
 				{
 					var alpha = 1 - tileFractionOfLifeRemaining;
-					this.graphics.fillStyle = "rgba(255, 255, 255, " + alpha + ")";
-					this.graphics.fillRect
+					g.fillStyle = "rgba(255, 255, 255, " + alpha + ")";
+					g.fillRect
 					(
 						drawPos.x,
 						drawPos.y,
@@ -221,7 +245,7 @@ function DisplayHelper()
 		}
 	}
 
-	DisplayHelper.prototype.initialize = function(useColors, viewSizeInPixels)
+	initialize(useColors: boolean, viewSizeInPixels: Coords): void
 	{
 		this.useColors = useColors;
 

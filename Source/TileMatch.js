@@ -1,5 +1,6 @@
-
-function TileMatch(cellPositions)
-{
-	this.cellPositions = cellPositions;
+"use strict";
+class TileMatch {
+    constructor(cellPositions) {
+        this.cellPositions = cellPositions;
+    }
 }
