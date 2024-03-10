@@ -10,6 +10,11 @@ class Coords {
         this.y += other.y;
         return this;
     }
+    clear() {
+        this.x = 0;
+        this.y = 0;
+        return this;
+    }
     clone() {
         return new Coords(this.x, this.y);
     }

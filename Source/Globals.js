@@ -2,8 +2,7 @@
 class Globals {
     initialize(millisecondsPerTimerTick, viewSizeInPixels, level) {
         this.display = new Display();
-        var useColors = true;
-        this.display.initialize(useColors, viewSizeInPixels);
+        this.display.initialize(viewSizeInPixels);
         this.level = level;
         this.randomizer = new RandomizerLCG(12345, 54321, 123456789, .12345);
         setInterval(this.handleEventTimerTick.bind(this), millisecondsPerTimerTick);

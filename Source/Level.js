@@ -14,6 +14,10 @@ class Level {
         this.numberOfMatchesSoFar = 0;
         this.haveMatchesBeenCheckedSinceLastChange = false;
         this.isFinished = false;
+        this.colorHighlight = "White";
+        this.colorBorderAndText = "LightGray";
+        this._cellPos = new Coords(0, 0);
+        this._drawPos = new Coords(0, 0);
     }
     // instance methods
     eliminateCellAtPos(cellPosToEliminate) {
@@ -149,7 +153,8 @@ class Level {
     }
     updateForTimerTick() {
         this.updateForTimerTick_FillTopRow();
-        Globals.Instance.display.drawLevel(this);
+        var display = Globals.Instance.display;
+        this.drawToDisplay(display);
         this.updateForTimerTick_Tiles();
         this.updateForTimerTick_WinOrLose();
     }
@@ -276,8 +281,8 @@ class Level {
                 }
             }
         }
-        if (areAllTilesAtRest == true) {
-            if (this.haveMatchesBeenCheckedSinceLastChange == true) {
+        if (areAllTilesAtRest) {
+            if (this.haveMatchesBeenCheckedSinceLastChange) {
                 this.updateForTimerTick_Input();
             }
             else {
@@ -295,6 +300,54 @@ class Level {
             else if (this.numberOfMovesSoFar >= this.numberOfMovesAllowed) {
                 alert("Out of moves! You lose.");
                 this.isFinished = true;
+            }
+        }
+    }
+    // Drawing.
+    drawToDisplay(display) {
+        var level = this;
+        display.clear();
+        var levelMap = level.map;
+        this.drawToDisplay_Map(display);
+        var tiles = level.tiles;
+        for (var i = 0; i < tiles.length; i++) {
+            var tile = tiles[i];
+            tile.drawToDisplayForLevel(display, level);
+        }
+        this.drawToDisplay_Cursor(display);
+        var textColor = this.colorBorderAndText;
+        var fontHeight = 10; // hack
+        display.drawTextWithColorAndHeightAtPos("Matches:" + level.numberOfMatchesSoFar + "/" + level.numberOfMatchesToWin, textColor, fontHeight, new Coords(2, levelMap.sizeInPixels.y + fontHeight));
+        display.drawTextWithColorAndHeightAtPos("Moves:" + level.numberOfMovesSoFar + "/" + level.numberOfMovesAllowed, textColor, fontHeight, new Coords(2, levelMap.sizeInPixels.y + (fontHeight * 2)));
+    }
+    drawToDisplay_Cursor(display) {
+        var cursor = this.cursor;
+        var mapCellSizeInPixels = this.map.cellSizeInPixels;
+        var drawPos = this._drawPos.overwriteWith(cursor.pos).add(new Coords(.25, .25)).multiply(mapCellSizeInPixels);
+        var cursorSizeInPixels = mapCellSizeInPixels.clone().divideScalar(2);
+        var g = display.graphics;
+        if (cursor.isTileSelected) {
+            g.strokeStyle = this.colorHighlight;
+        }
+        else {
+            g.strokeStyle = this.colorBorderAndText;
+        }
+        g.strokeRect(drawPos.x, drawPos.y, cursorSizeInPixels.x, cursorSizeInPixels.y);
+    }
+    drawToDisplay_Map(display) {
+        var map = this.map;
+        var mapSizeInCells = map.sizeInCells;
+        var cellSizeInPixels = map.cellSizeInPixels;
+        var cellPos = this._cellPos.clear();
+        var drawPos = this._drawPos;
+        var colorBorder = "LightGray";
+        for (var y = 0; y < mapSizeInCells.y; y++) {
+            cellPos.y = y;
+            for (var x = 0; x < mapSizeInCells.x; x++) {
+                cellPos.x = x;
+                drawPos.overwriteWith(cellPos).multiply(cellSizeInPixels);
+                display.drawRectangleWithColorFillBorderSizeAtPos(null, // colorFill
+                colorBorder, cellSizeInPixels, drawPos);
             }
         }
     }

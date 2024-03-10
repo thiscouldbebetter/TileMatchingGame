@@ -16,8 +16,7 @@ class Globals
 	)
 	{
 		this.display = new Display();
-		var useColors = true;
-		this.display.initialize(useColors, viewSizeInPixels);
+		this.display.initialize(viewSizeInPixels);
 
 		this.level = level;
 
