@@ -1,34 +1,34 @@
 
-class VisualRectangle implements Visual
+class VisualCircle implements Visual
 {
 	color: string;
-	size: Coords;
+	radius: number;
 
-	constructor(color: string, size: Coords)
+	constructor(color: string, radius: number)
 	{
 		this.color = color;
-		this.size = size;
+		this.radius = radius;
 	}
 
 	clone(): Visual
 	{
-		return new VisualRectangle(this.color, this.size.clone() );
+		return new VisualCircle(this.color, this.radius );
 	}
 
 	drawToDisplayAtPos(display: Display, posToDrawAt: Coords): void
 	{
-		display.drawRectangleWithColorsFillAndBorderOfSizeCenteredAtPos
+		display.drawCircleWithColorsFillAndBorderOfRadiusAtPos
 		(
 			this.color,
 			null, // colorBorder
-			this.size,
+			this.radius,
 			posToDrawAt
 		);
 	}
 
 	transformScaleByFactor(scaleFactor: number): Visual
 	{
-		this.size.multiplyScalar(scaleFactor);
+		this.radius *= scaleFactor;
 		return this;
 	}
 }

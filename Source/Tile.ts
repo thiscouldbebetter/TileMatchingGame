@@ -30,23 +30,19 @@ class Tile
 	drawToDisplayForLevel(display: Display, level: Level): void
 	{
 		var tile = this;
-		var map= level.map;
+		var map = level.map;
 		var tileDefn = tile.defn();
 		var mapCellSizeInPixels = map.cellSizeInPixels;
 		var tilePos = map.posOfCell(tile.cell);
 
-		var drawPos = this._drawPos.overwriteWith
-		(
-			tilePos
-		).multiply
-		(
-			mapCellSizeInPixels
-		);
+		var halves = Coords.ones().half();
 
-		var drawSize = this._drawSize.overwriteWith
-		(
-			mapCellSizeInPixels
-		);
+		var drawPos = this._drawPos
+			.overwriteWith(tilePos)
+			.add(halves)
+			.multiply(mapCellSizeInPixels);
+
+		var tileVisual = tileDefn.visual;
 
 		var tileFractionOfLifeRemaining = 
 		(
@@ -55,24 +51,16 @@ class Tile
 
 		if (tileFractionOfLifeRemaining != null)
 		{
-			drawSize = drawSize.multiplyScalar
-			(
-				tileFractionOfLifeRemaining
-			);
+			tileVisual =
+				tileVisual
+				.clone()
+				.transformScaleByFactor(tileFractionOfLifeRemaining);
 		}
 
-		drawPos.add
+		tileVisual.drawToDisplayAtPos
 		(
-			mapCellSizeInPixels.clone().subtract
-			(
-				drawSize
-			).divideScalar(2)
-		);
-
-		display.drawRectangleWithColorFillBorderSizeAtPos
-		(
-			tileDefn.color, null, drawSize, drawPos
-		);
+			display, drawPos
+		)
 	}
 
 }

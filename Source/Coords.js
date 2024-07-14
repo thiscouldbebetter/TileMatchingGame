@@ -5,6 +5,12 @@ class Coords {
         this.x = x;
         this.y = y;
     }
+    static create() {
+        return new Coords(0, 0);
+    }
+    static ones() {
+        return new Coords(1, 1);
+    }
     add(other) {
         this.x += other.x;
         this.y += other.y;
@@ -37,6 +43,12 @@ class Coords {
         this.x = Math.floor(this.x);
         this.y = Math.floor(this.y);
         return this;
+    }
+    half() {
+        return this.divideScalar(2);
+    }
+    invert() {
+        return this.multiplyScalar(-1);
     }
     multiply(other) {
         this.x *= other.x;

@@ -12,6 +12,16 @@ class Coords
 		this.y = y;
 	}
 
+	static create()
+	{
+		return new Coords(0, 0);
+	}
+
+	static ones()
+	{
+		return new Coords(1, 1);
+	}
+
 	add(other: Coords): Coords
 	{
 		this.x += other.x;
@@ -66,6 +76,16 @@ class Coords
 		this.y = Math.floor(this.y);
 
 		return this;
+	}
+
+	half()
+	{
+		return this.divideScalar(2);
+	}
+
+	invert()
+	{
+		return this.multiplyScalar(-1);
 	}
 
 	multiply(other: Coords): Coords
