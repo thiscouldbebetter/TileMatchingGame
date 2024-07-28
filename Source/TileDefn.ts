@@ -47,37 +47,77 @@ class TileDefn_Instances
 		var tileSize =
 			Coords.ones().multiplyScalar(tileDimension);
 
+		var radiusHighlight = tileDimension / 8;
+
+		var visualHighlight = new VisualOffset
+		(
+			Coords.ones().invert().multiplyScalar(radiusHighlight),
+			new VisualGroup
+			([
+				new VisualCircle("Black", radiusHighlight),
+				new VisualOffset
+				(
+					Coords.ones().invert().multiplyScalar(1),
+					new VisualCircle("White", radiusHighlight * .5)
+				)
+			])
+		);
+
 		// Circle.
 		var vc = (color: string) =>
-			new VisualCircle(color, tileDimensionHalf * .8);
+			new VisualGroup
+			([
+				new VisualCircle(color, tileDimensionHalf * .8),
+
+				visualHighlight
+			]);
 
 		// Square.
 		var vs = (color: string) =>
-			new VisualRectangle(color, tileSize.clone().multiplyScalar(.8) );
+			new VisualGroup
+			([
+				new VisualRectangle
+				(
+					color,
+					tileSize.clone().multiplyScalar(.8)
+				),
+
+				visualHighlight
+			]);
 
 		// Triangle.
 		var vt = (color: string) =>
-			new VisualPolygon
-			(
-				color,
-				[
-					new Coords(0, -tileDimensionHalf),
-					new Coords(tileDimensionHalf, tileDimensionHalf),
-					new Coords(-tileDimensionHalf, tileDimensionHalf)
-				]
-			);
+			new VisualGroup
+			([
+				new VisualPolygon
+				(
+					color,
+					[
+						new Coords(0, -tileDimensionHalf),
+						new Coords(tileDimensionHalf, tileDimensionHalf),
+						new Coords(-tileDimensionHalf, tileDimensionHalf)
+					]
+				).transformScaleByFactor(.8),
+
+				visualHighlight
+			]);
 
 		// Triangle inverted.
 		var vti = (color: string) =>
-			new VisualPolygon
-			(
-				color,
-				[
-					new Coords(0, tileDimensionHalf),
-					new Coords(tileDimensionHalf, -tileDimensionHalf),
-					new Coords(-tileDimensionHalf, -tileDimensionHalf)
-				]
-			);
+			new VisualGroup
+			([
+				new VisualPolygon
+				(
+					color,
+					[
+						new Coords(0, tileDimensionHalf),
+						new Coords(tileDimensionHalf, -tileDimensionHalf),
+						new Coords(-tileDimensionHalf, -tileDimensionHalf)
+					]
+				).transformScaleByFactor(.8),
+
+				visualHighlight
+			]);
 
 		// Star.
 		var vstar = (color: string) =>
@@ -108,11 +148,11 @@ class TileDefn_Instances
 				vertices.push(vertex);
 			}
 
-			return new VisualPolygon
-			(
-				color,
-				vertices
-			);
+			return new VisualGroup
+			([
+				new VisualPolygon(color, vertices),
+				visualHighlight
+			]);
 		}
 
 		// Hexagon.
@@ -138,11 +178,21 @@ class TileDefn_Instances
 				vertices.push(vertex);
 			}
 
-			return new VisualPolygon
+			var visualBody = new VisualPolygon
 			(
 				color,
 				vertices
 			);
+
+			visualBody.transformScaleByFactor(.9);
+
+			var visual = new VisualGroup
+			([
+				visualBody,
+				visualHighlight
+			]);
+
+			return visual;
 		}
 
 		this.A = new TileDefn("A", "Red", vs("Red") );
